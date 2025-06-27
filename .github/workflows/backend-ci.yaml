@@ -37,7 +37,7 @@ jobs:
 
       - name: Run tests with pytest
         run: |
-          PYTHONPATH=$(pwd) pipenv run pytest
+          pipenv run pytest
 
   lint:
     runs-on: ubuntu-latest
