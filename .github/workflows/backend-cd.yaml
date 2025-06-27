@@ -100,7 +100,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
-          IMAGE_URI=${ECR_REGISTRY}/${ECR_REPOSITORY}:latest
+          IMAGE_URI=${ECR_REGISTRY}/${ECR_REPOSITORY}:${{ github.sha }}
             
           echo "Building image: $IMAGE_URI"
           docker build -t $IMAGE_URI .
