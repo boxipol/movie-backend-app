@@ -1,6 +1,6 @@
 import os
 
-from movie-backend-app import app
+from . import app
 
 
 def test_movies_endpoint_returns_200():
