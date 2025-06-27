@@ -1,0 +1,127 @@
+name: Backend CI
+
+on:
+  workflow_dispatch:
+
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          node-version: 3.12
+
+      - name: Cache pipenv and pip cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.local/share/virtualenvs
+          key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pipenv-
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install pipenv
+          pipenv install --dev
+
+      - name: Run tests with pytest
+        working-directory: ./backend
+        run: |
+          pipenv run pytest
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          node-version: 3.12
+
+      - name: Cache pipenv and pip cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.local/share/virtualenvs
+          key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pipenv-
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pytest
+          pip install flask-cors
+
+      - name: Lint with test app
+        working-directory: ./backend
+        run: |
+          flake8 movies/
+
+  build:
+    needs: [test, lint]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          node-version: 3.12
+
+      - name: Cache pipenv and pip cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.local/share/virtualenvs
+          key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pipenv-
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install pipenv
+          pipenv install --dev
+          pipenv run pip install flask-cors
+          pipenv run pip install flask
+
+      - name: Build the package
+        working-directory: ./backend
+        run: |
+          pipenv run python -m movies.movies_api
+
+      - name: Publish test results
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: test-results
+          path: build/
+
+#  deploy:
+#    name: Deploy to Kubernetes
+#    uses: azure/k8s-deploy@v4
+#    with:
+#      manifests: |
+#        kubernetes/deployment.yaml
+#        kubernetes/service.yaml
+#      namespace: 'my-app'
+#    run: docker build --build-arg=BLOG_API_KEY=${API_KEY} backend-image .
