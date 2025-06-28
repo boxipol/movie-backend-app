@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: backend-container
-          image: 381491841776.dkr.ecr.us-east-1.amazonaws.com/backend-app:latest
+          image: IMAGE_PLACEHOLDER
           ports:
             - containerPort: 5555
 
