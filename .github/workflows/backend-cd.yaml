@@ -10,6 +10,7 @@ on:
 env:
   AWS_REGION: us-east-1
   ECR_REPOSITORY: backend-app
+  EKS_CLUSTER_NAME: movie-app-cluster
 
 jobs:
   test:
@@ -105,3 +106,13 @@ jobs:
           echo "Building image: $IMAGE_URI"
           docker build -t $IMAGE_URI .
           docker push $IMAGE_URI
+
+      - name: Update kubeconfig for EKS
+        run: |
+          aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME} --region ${AWS_REGION}
+
+      - name: Deploy to EKS
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          kubectl set image k8s/deployment.yaml my-app=$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}

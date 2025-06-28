@@ -18,4 +18,4 @@ spec:
         - name: backend-container
           image: 381491841776.dkr.ecr.us-east-1.amazonaws.com/backend-app:latest
           ports:
-            - containerPort: 5000
+            - containerPort: 5555
