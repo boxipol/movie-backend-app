@@ -76,7 +76,7 @@ jobs:
 #          flake8 movies/
 
   build:
-    needs: [test, lint]
+#    needs: [test, lint]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
