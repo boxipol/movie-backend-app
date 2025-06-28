@@ -19,3 +19,20 @@ spec:
           image: 381491841776.dkr.ecr.us-east-1.amazonaws.com/backend-app:latest
           ports:
             - containerPort: 5555
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-app
+  labels:
+    app: backend-app
+spec:
+  type: LoadBalancer
+  selector:
+    app: backend-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5555
